@@ -1,6 +1,4 @@
 #include <stdbool.h>
-#ifndef RAT_H
-#define RAT_H
 
 struct rtype {
 	int n,d; // numerator, denominator
@@ -20,4 +18,3 @@ rat divide(const rat r1, const rat r2); // r1 / r2
 rat inverse(const rat); // returns argument inverted
 bool wellFormed(const rat); // returns true if number is legal, false otherwise
 char *toString(const rat); // returns string representation of argument
-#endif
