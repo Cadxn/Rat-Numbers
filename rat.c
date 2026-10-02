@@ -5,6 +5,12 @@
 #ifndef RAT_H
 #define RAT_H
 
+
+///////////////////////////////////////
+// Creates Rational Number Structure //
+///////////////////////////////////////
+
+
 rat createRat(int n,int d){
     rat temp_rat = (rat)malloc(sizeof(struct rtype));
 
@@ -12,11 +18,18 @@ rat createRat(int n,int d){
     temp_rat->d = d;
 
     if(temp_rat->d==0){
-       exit(1);
+        printf("Undefined");
+        exit(1);
     }
 
     return temp_rat;
 }
+
+///////////////////////////////////////
+// Normal, Reduce, Compare functions //
+///////////////////////////////////////
+
+
 rat norm(const rat r){
     rat temp_rat = r;
     int count = 1, size = 1;
@@ -75,11 +88,10 @@ rat reduce(const rat r){
 }
 int cmp(const rat r1, const rat r2){
 
-    rat ratr1 = norm(r1);
-    rat ratr2 = norm(r2);
+    int ratr1 = 0, ratr2 = 0;
 
-    ratr1->n *= r2->d;
-    ratr2->d *= r1->n;
+    ratr1 = r1->n * r2->d;
+    ratr2 = r2->n * r1->d;
 
     if(ratr1 < ratr2){
         return -1;
@@ -139,9 +151,9 @@ rat divide(const rat r1, const rat r2){
     return temp_rat;
 }
 
-///////////////////////////////////////////////////////////////////
-// Addition, Subtraction, Multiplicative, and Division functions //
-///////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// Inverse, wellFormed, and toString Functions //
+/////////////////////////////////////////////////
 
 
 
@@ -152,6 +164,7 @@ rat inverse(const rat r){
     temp_rat->n = r->d;
 
     if(temp_rat->d==0){
+        printf("Undefined");
         exit(1);
     }
 
