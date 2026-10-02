@@ -18,7 +18,7 @@ rat createRat(int n,int d){
     temp_rat->d = d;
 
     if(temp_rat->d==0){
-        printf("Undefined");
+        printf("Error: Denominator 0");
         exit(1);
     }
 
@@ -31,8 +31,11 @@ rat createRat(int n,int d){
 
 
 rat norm(const rat r){
-    rat temp_rat = r;
+    rat temp_rat = (rat)malloc(sizeof(struct rtype));
     int count = 1, size = 1;
+
+    temp_rat->d = r->d;
+    temp_rat->n = r->n;
 
     if(abs(r->d)>abs(r->n)){
         size = r->d;
@@ -40,6 +43,11 @@ rat norm(const rat r){
         size = r->n;
     }
 
+    if(r->n == 0){
+        temp_rat->n = 0;
+        temp_rat->d = 1;
+        return temp_rat;
+    }
 
     for(int i = 1; i<size;i++){
         if(((r->d)%i==0) && ((r->n%i)==0)){
@@ -58,7 +66,10 @@ rat norm(const rat r){
     return temp_rat;
 }
 rat reduce(const rat r){
-    rat temp_rat = r;
+    rat temp_rat = (rat)malloc(sizeof(struct rtype));
+
+    temp_rat->d = r->d;
+    temp_rat->n = r->n;
 
     if(r->n == 0){
         temp_rat->n = 0;
@@ -140,6 +151,12 @@ rat mul(const rat r1, const rat r2){
     return temp_rat;
 }
 rat divide(const rat r1, const rat r2){
+
+    if(r2->n == 0){
+        printf("Error: Numerator became 0 after second fraction flipped while dividing");
+        exit(1);
+    }
+
     rat temp_rat = malloc(sizeof(struct rtype));
 
     temp_rat->n = r1->n * r2->d;
@@ -164,7 +181,7 @@ rat inverse(const rat r){
     temp_rat->n = r->d;
 
     if(temp_rat->d==0){
-        printf("Undefined");
+        printf("Error: Inversion Resulted in Denominator of 0");
         exit(1);
     }
 

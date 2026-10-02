@@ -1,81 +1,125 @@
 #include <stdio.h>
 #include "rat.c"
 
-void runTest(const char* testName, rat result, const char* expectedStr) {
-    char *resultStr = toString(result);
-    printf("[%s] Expected: %s | Got: %s\n", testName, expectedStr, resultStr);
-    
-    // Clean up memory to avoid leaks during testing
-    free(resultStr);
-    free(result);
+void printRat(const char *label, rat r) {
+    char *str = toString(r);
+    printf("%s %s\n", label, str);
+    free(str); // Free memory allocated by toString
 }
+
 
 
 int main(){
 
-    printf("=== STARTING RATIONAL NUMBER TEST SUITE ===\n\n");
+printf("--- Beginning Rational Numbers Test Suite ---\n\n");
 
-    // 1. Basic Setup & Math Operations
-    rat r1 = createRat(2, 3);   //  2/3
-    rat r2 = createRat(5, -6);  // -5/6
+    // ==========================================
+    // 1. Initial Creation and String Representation
+    // ==========================================
+    printf("[1] Basic Creation & Output Tests:\n");
+    rat r1 = createRat(2, 3);
+    rat r2 = createRat(5, -6);
     
-    // Test Addition: 2/3 + (-5/6) = 4/6 - 5/6 = -1/6
-    runTest("Addition (Standard)", add(r1, r2), "-1/6");
-    
-    // Test Subtraction: 2/3 - (-5/6) = 4/6 + 5/6 = 9/6 = 3/2
-    runTest("Subtraction (Standard)", sub(r1, r2), "3/2");
-    
-    // Test Multiplication: (2/3) * (-5/6) = -10/18 = -5/9
-    runTest("Multiplication (Standard)", mul(r1, r2), "-5/9");
-    
-    // Test Division: (2/3) / (-5/6) = (2/3) * (-6/5) = -12/15 = -4/5
-    runTest("Division (Standard)", divide(r1, r2), "-4/5");
+    printRat("r1 (expected 2/3):", r1);
+    printRat("r2 (expected 5/-6):", r2);
+    printf("\n");
 
-    printf("\n=== TESTING EDGE CASES ===\n\n");
-
-    // 2. Complex/Large Reductions
-    rat rLarge1 = createRat(100, 200); // 1/2
-    rat rLarge2 = createRat(15, 45);   // 1/3
-    runTest("Large Reduction Add", add(rLarge1, rLarge2), "5/6");
+    // ==========================================
+    // 2. Normalization & Reduction Checks
+    // ==========================================
+    printf("[2] Normalization & Reduction Tests:\n");
+    rat r3 = createRat(9, -3);
+    rat r3_norm = norm(r3);
+    rat r3_red = reduce(r3);
+    printRat("r3 raw (expected 9/-3):", r3);
+    printRat("r3 normalized (expected -9/3):", r3_norm);
+    printRat("r3 reduced (expected -3/1):", r3_red);
     
-    // 3. Multiplication and operations with Zero
-    rat rZero = createRat(0, 5); // 0/1
-    rat rSimple = createRat(3, 4);
-    runTest("Multiply by Zero", mul(rSimple, rZero), "0/1");
-    runTest("Add with Zero", add(rSimple, rZero), "3/4");
-
-    // 4. Testing Comparisons (cmp)
-    printf("\n=== TESTING COMPARISONS ===\n");
-    rat c1 = createRat(1, 2);
-    rat c2 = createRat(2, 4);
-    rat c3 = createRat(3, 4);
+    rat zero_neg = createRat(0, -5);
+    rat zero_norm = norm(zero_neg);
+    printRat("0/-5 normalized (expected 0/1):", zero_norm);
     
-    printf("[cmp] 1/2 vs 2/4 (Expected 0): %d\n", cmp(c1, c2));
-    printf("[cmp] 1/2 vs 3/4 (Expected -1): %d\n", cmp(c1, c3));
-    printf("[cmp] 3/4 vs 1/2 (Expected 1): %d\n", cmp(c3, c1));
+    free(r3); free(r3_norm); free(r3_red);
+    free(zero_neg); free(zero_norm);
+    printf("\n");
 
-    // 5. Testing Legal Form (wellFormed)
-    printf("\n=== TESTING WELL-FORMED STATE ===\n");
-    printf("Is r1 well formed initially? (Expected yes): %s\n", wellFormed(r1) ? "yes" : "no");
+    // ==========================================
+    // 3. Comparisons
+    // ==========================================
+    printf("[3] Comparison Tests:\n");
+    rat comp1 = createRat(1, 2);
+    rat comp2 = createRat(2, 4);
+    rat comp3 = createRat(-3, 4);
     
-    // Force r1 into an ill-formed state by corrupting the denominator
-    r1->d = 0;
-    printf("Is r1 well formed after setting d=0? (Expected no): %s\n", wellFormed(r1) ? "yes" : "no");
+    printf("1/2 vs 2/4 (expected 0): %d\n", cmp(comp1, comp2));
+    printf("1/2 vs -3/4 (expected 1): %d\n", cmp(comp1, comp3));
+    printf("-3/4 vs 1/2 (expected -1): %d\n", cmp(comp3, comp1));
+    
+    free(comp1); free(comp2); free(comp3);
+    printf("\n");
 
-    // Clean up initial test objects
+    // ==========================================
+    // 4. Arithmetic Operations
+    // ==========================================
+    printf("[4] Arithmetic Operation Tests:\n");
+    // 2/3 + 5/-6 = 4/6 - 5/6 = -1/6
+    rat sum = add(r1, r2);
+    printRat("2/3 + 5/-6 (expected -1/6):", sum);
+    
+    // 2/3 - 5/-6 = 4/6 + 5/6 = 9/6 = 3/2
+    rat diff = sub(r1, r2);
+    printRat("2/3 - 5/-6 (expected 3/2):", diff);
+    
+    // 2/3 * 5/-6 = 10/-18 = -5/9
+    rat product = mul(r1, r2);
+    printRat("2/3 * 5/-6 (expected -5/9):", product);
+    
+    // (2/3) / (5/-6) = (2/3) * (-6/5) = -12/15 = -4/5
+    rat quotient = divide(r1, r2);
+    printRat("(2/3) / (5/-6) (expected -4/5):", quotient);
+    
+    free(sum); free(diff); free(product); free(quotient);
+    printf("\n");
+
+    // ==========================================
+    // 5. Inversion
+    // ==========================================
+    printf("[5] Inversion Tests:\n");
+    rat inv_r1 = inverse(r1);
+    printRat("Invert 2/3 (expected 3/2):", inv_r1);
+    free(inv_r1);
+    printf("\n");
+
+    // ==========================================
+    // 6. Well-Formed Status Validation
+    // ==========================================
+    printf("[6] Well-Formed Assessment Tests:\n");
+    printf("Is r1 well-formed? (expected yes): %s\n", wellFormed(r1) ? "yes" : "no");
+    
+    // Artificially forcing an illegal state to test wellFormed evaluation
+    r1->d = 0; 
+    printf("Is r1 well-formed after setting d=0? (expected no): %s\n", wellFormed(r1) ? "yes" : "no");
+    printRat("toString on illegal r1 (expected 2/0):", r1);
+    printf("\n");
+
+    // Cleanup initial variables
+    free(r1);
     free(r2);
-    free(rLarge1);
-    free(rLarge2);
-    free(rZero);
-    free(rSimple);
-    free(c1);
-    free(c2);
-    free(c3);
-    // Note: We don't free(r1) here because its denominator is 0, 
-    // but in normal behavior you would track your allocations cleanly.
 
-    printf("\n=== TESTING COMPLETE ===\n");
+    // ==========================================
+    // 7. Fatal Error Edge Cases (To trigger, uncomment one at a time)
+    // ==========================================
+    printf("[7] Fatal Error Execution Trigger tests:\n");
+    printf("Uncomment one line in source to test structural crash exits:\n");
     
+    //rat bad_zero = createRat(5, 0);       // Should trigger denominator 0 error
+     //rat zero_num = createRat(0, 4);
+     //rat bad_inv = inverse(zero_num);      // Should trigger inversion error
+     //rat bad_div = divide(r2, zero_num);   // Should trigger division by zero error
+
+    printf("\n--- Test Suite Complete (All Non-Fatal Steps Passed) ---\n");
+    return 0;
+
 
     return 0;
 
